@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id             String    @id
+  dashboardId    String    @unique
+  companyName    String
+  email          String
+  industry       String
+  language       String    @default("en")
+  website        String?
+  dashboardStatus String   @default("PENDING")
+  stage          String    @default("PENDING_GENERATION")
+  subject        String?
+  bodyText       String?
+  html           String?
+  error          String?
+  generatedAt    DateTime?
+  sentAt         DateTime?
+  syncedAt       DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}

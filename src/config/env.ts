@@ -52,6 +52,7 @@ export const config = {
   dashboardMockPort: envNumber("DASHBOARD_MOCK_PORT", 43148),
   dashboardUseMock: envBool("DASHBOARD_USE_MOCK", true),
   dashboardTimeoutMs: envNumber("DASHBOARD_TIMEOUT_MS", 20_000),
+  smtpMock: envBool("SMTP_MOCK", false),
 };
 
 export function hasOpenAiKey(): boolean {

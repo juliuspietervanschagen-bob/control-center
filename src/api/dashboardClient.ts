@@ -58,21 +58,33 @@ async function readJson(response: Response): Promise<unknown> {
   }
 }
 
-export async function extractPendingLeads(): Promise<DashboardLead[]> {
-  const url = leadsUrl(true);
-  const response = await dashboardFetch(url);
+export async function fetchLeads(
+  statuses: string[] = [...PENDING_LEAD_STATUSES],
+): Promise<DashboardLead[]> {
+  const base = config.dashboardApiUrl.replace(/\/+$/, "");
+  const path = config.dashboardLeadsPath.startsWith("/")
+    ? config.dashboardLeadsPath
+    : `/${config.dashboardLeadsPath}`;
+  const url = new URL(`${base}${path}`);
+  if (statuses.length > 0) {
+    url.searchParams.set("status", statuses.join(","));
+  }
+  const response = await dashboardFetch(url.toString());
   if (response.status === 401 || response.status === 403) {
     throw new Error("Dashboard rejected the API key. Check DASHBOARD_API_KEY.");
   }
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`extractPendingLeads failed (${response.status}): ${body.slice(0, 180)}`);
+    throw new Error(`fetchLeads failed (${response.status}): ${body.slice(0, 180)}`);
   }
   const payload = await readJson(response);
   const leads = parseDashboardLeadList(payload);
-  return leads.filter((lead) =>
-    (PENDING_LEAD_STATUSES as readonly string[]).includes(lead.status),
-  );
+  if (statuses.length === 0) return leads;
+  return leads.filter((lead) => statuses.includes(lead.status));
+}
+
+export async function extractPendingLeads(): Promise<DashboardLead[]> {
+  return fetchLeads([...PENDING_LEAD_STATUSES]);
 }
 
 function dashboardStatus(status: OutreachUpdateStatus): "CONTACTED" | "FAILED" {

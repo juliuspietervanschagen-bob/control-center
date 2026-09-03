@@ -6,3 +6,8 @@ campaign_state.json
 dashboard_state.json
 *.log
 .DS_Store
+.next/
+prisma/dev.db
+prisma/dev.db-journal
+tmp-scaffold/
+src/generated/
