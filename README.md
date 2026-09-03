@@ -18,15 +18,19 @@ If `DASHBOARD_USE_MOCK=true`, the app starts a local dashboard API on port 43148
 ## Flow
 
 1. **Sync leads** — pulls pending/uncontacted (and known) leads into SQLite.
-2. **Generate draft** — Jina reads the live site, then a 85–150 word EN/NL note: intro, three audit bullets, solution, soft CTA, inlined HTML.
+2. **Generate draft** — Jina reads the live site, then a 85–150 word EN/NL note: intro, three audit bullets, solution, soft CTA, inlined HTML with a CID signature image.
 3. **Review / edit** — subject and body in the side panel; save to recompile HTML.
 4. **Send & complete** — Nodemailer SMTP, then PATCH the external dashboard to `CONTACTED`.
 
 Without real SMTP credentials, keep `SMTP_MOCK=true`. Set it to `false` and fill `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` for live delivery.
 
+## Email signature
+
+Outbound HTML includes a CID-linked signature image (`cid:jrsignature` → `public/assets/image_029d84.jpg`). Nodemailer attaches the JPEG inline — not as Base64 in the HTML — so clients render it without spam-prone data URIs. Replace that file in place to update the signature art.
+
 ## Skills
 
-`.cursor/skills/` governs copy, HTML, compliance, dashboard sync, and this UI.
+`.cursor/skills/` governs copy, HTML, compliance, dashboard sync, signature embedding, and this UI.
 
 ## CLI (still available)
 

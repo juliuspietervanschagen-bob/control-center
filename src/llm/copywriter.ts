@@ -56,18 +56,8 @@ function localBody(lead: Lead, markdown: string): string {
   const cta = nl
     ? "Zouden jullie 15 minuten hebben voor een kort gesprek hierover?"
     : "Would you have 15 minutes for a short chat about this?";
-  const signoff = nl
-    ? `Met vriendelijke groet,\nRik en Julius\nJR Intelligence`
-    : `Kind regards,\nRik and Julius\nJR Intelligence`;
 
-  return [
-    greeting,
-    intro,
-    bullets,
-    solution,
-    cta,
-    signoff,
-  ].join("\n\n");
+  return [greeting, intro, bullets, solution, cta].join("\n\n");
 }
 
 function bodySystemPrompt(skill: string): string {
@@ -81,7 +71,7 @@ function bodySystemPrompt(skill: string): string {
     "- Return only the email body. No subject. No markdown fences.",
     "- 85 to 150 words. Punchy. No robotic words: delve, seamless, tapestry, testament.",
     "- After the intro, output exactly three audit points as consecutive lines starting with '- ' (no blank lines between the three).",
-    "- Then one short solution paragraph. Then a soft CTA. Then sign off as Rik and Julius, JR Intelligence.",
+    "- Then one short solution paragraph. Then a soft CTA. Do not include a sign-off; the HTML template adds it.",
     "- English emails must include this sentence verbatim:",
     `  ${JR_INTRO_EN}`,
     "- Dutch emails must include this sentence verbatim:",

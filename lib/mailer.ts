@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { config } from "../src/config/env";
+import { signatureAttachment } from "./signature";
 
 export class SmtpError extends Error {
   constructor(message: string) {
@@ -40,6 +41,7 @@ export async function sendApprovedEmail(input: {
       subject: input.subject,
       text: input.text,
       html: input.html,
+      attachments: [signatureAttachment()],
       headers: {
         "X-JR-Campaign": "b2b-outreach",
         "List-Unsubscribe": `<mailto:${config.optOutEmail}?subject=unsubscribe>`,

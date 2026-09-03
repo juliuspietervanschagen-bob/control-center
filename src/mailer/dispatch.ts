@@ -5,6 +5,7 @@ import { config, ensureDir } from "../config/env";
 import { hasBeenEmailed, recordSend } from "../db/campaignState";
 import { formatDuration, randomJitterMs, wait } from "./jitter";
 import { createTransport } from "./transport";
+import { signatureAttachment } from "../../lib/signature";
 
 function slug(value: string): string {
   return value
@@ -50,6 +51,7 @@ export async function dispatchEmail(
     subject: email.subject,
     text: email.bodyText,
     html: email.html,
+    attachments: [signatureAttachment()],
     headers: {
       "X-JR-Campaign": "b2b-outreach",
       "List-Unsubscribe": `<mailto:${config.optOutEmail}?subject=unsubscribe>`,

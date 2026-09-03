@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { htmlForPreview } from "@/lib/signature";
 import { cn } from "@/lib/utils";
 
 export type LeadRecord = {
@@ -381,7 +382,7 @@ export function ControlPanel() {
                         <iframe
                           title="Email preview"
                           className="h-[640px] w-full bg-white"
-                          srcDoc={active.html}
+                          srcDoc={htmlForPreview(active.html, window.location.origin)}
                         />
                       </ScrollArea>
                     </div>

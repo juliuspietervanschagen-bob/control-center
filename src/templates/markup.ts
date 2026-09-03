@@ -1,6 +1,7 @@
 import type { LanguagePreference, Lead } from "../config/types";
 import { config } from "../config/env";
 import { geometricPatternDataUri } from "./pattern";
+import { signatureBlock } from "../../lib/signature";
 
 function escapeHtml(value: string): string {
   return value
@@ -52,6 +53,15 @@ function bodyToHtml(bodyText: string): string {
   return html.join("\n");
 }
 
+function stripTrailingSignoff(bodyText: string): string {
+  return bodyText
+    .replace(
+      /\n+(?:kind regards|best regards|met vriendelijke groet)[\s\S]*$/i,
+      "",
+    )
+    .trim();
+}
+
 function optOutCopy(language: LanguagePreference): { label: string; line: string } {
   if (language === "nl") {
     return {
@@ -72,7 +82,7 @@ export function buildEmailMarkup(input: {
 }): string {
   const pattern = geometricPatternDataUri();
   const optOut = optOutCopy(input.lead.languagePreference);
-  const bodyHtml = bodyToHtml(input.bodyText);
+  const bodyHtml = bodyToHtml(stripTrailingSignoff(input.bodyText));
   const previewText =
     input.lead.languagePreference === "nl"
       ? `Kort bericht van JR Intelligence voor ${input.lead.companyName}.`
@@ -144,6 +154,12 @@ export function buildEmailMarkup(input: {
       line-height: 1.55;
       color: #18181b;
     }
+    .signoff {
+      margin: 8px 0 0 0;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #18181b;
+    }
     .footer-copy {
       margin: 0 0 8px 0;
       font-size: 12px;
@@ -173,6 +189,7 @@ export function buildEmailMarkup(input: {
           <tr>
             <td style="padding: 24px 36px 8px 36px;">
               ${bodyHtml}
+              ${signatureBlock(input.lead.languagePreference)}
             </td>
           </tr>
           <tr>
