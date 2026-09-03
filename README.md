@@ -19,8 +19,8 @@ If `DASHBOARD_USE_MOCK=true`, the app starts a local dashboard API on port 43148
 
 1. **Sync leads** — pulls pending/uncontacted (and known) leads into SQLite.
 2. **Generate draft** — Jina reads the live site, then a 85–150 word EN/NL note: intro, three audit bullets, solution, soft CTA, inlined HTML with a CID signature image.
-3. **Review / edit** — subject and body in the side panel; save to recompile HTML.
-4. **Send & complete** — Nodemailer SMTP, then PATCH the external dashboard to `CONTACTED`.
+3. **Review** — click a lead in the left list; the HTML email opens in the main pane (no modal). Edit, regenerate, or send from the sticky bar.
+4. **Send via SMTP** — Nodemailer, then PATCH the external dashboard to `CONTACTED`. Selection is kept in `?leadId=`.
 
 Without real SMTP credentials, keep `SMTP_MOCK=true`. Set it to `false` and fill `SMTP_HOST` / `SMTP_USER` / `SMTP_PASS` for live delivery.
 

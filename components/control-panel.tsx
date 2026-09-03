@@ -1,45 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, RefreshCw, Send, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, Pencil, RefreshCw, Send, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { htmlForPreview } from "@/lib/signature";
+import { EmailPreview } from "@/components/email-preview";
+import { LeadList } from "@/components/lead-list";
+import type { LeadRecord } from "@/components/lead-types";
 import { cn } from "@/lib/utils";
-
-export type LeadRecord = {
-  id: string;
-  dashboardId: string;
-  companyName: string;
-  email: string;
-  industry: string;
-  language: string;
-  website: string | null;
-  stage: "PENDING_GENERATION" | "READY_FOR_REVIEW" | "SENT" | string;
-  subject: string | null;
-  bodyText: string | null;
-  html: string | null;
-  error: string | null;
-  generatedAt: string | null;
-  sentAt: string | null;
-};
-
-const STAGES = [
-  { key: "PENDING_GENERATION", label: "Pending generation" },
-  { key: "READY_FOR_REVIEW", label: "Ready for review" },
-  { key: "SENT", label: "Sent" },
-] as const;
 
 function countWords(text: string): number {
   return text.replace(/\s+/g, " ").trim().split(" ").filter(Boolean).length;
@@ -59,25 +30,34 @@ async function readError(response: Response): Promise<string> {
 }
 
 export function ControlPanel() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const activeId = searchParams.get("leadId");
+
   const [leads, setLeads] = useState<LeadRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
   const [subject, setSubject] = useState("");
   const [bodyText, setBodyText] = useState("");
 
   const active = leads.find((lead) => lead.id === activeId) ?? null;
 
-  const grouped = useMemo(() => {
-    return {
-      PENDING_GENERATION: leads.filter((lead) => lead.stage === "PENDING_GENERATION"),
-      READY_FOR_REVIEW: leads.filter((lead) => lead.stage === "READY_FOR_REVIEW"),
-      SENT: leads.filter((lead) => lead.stage === "SENT"),
-    };
-  }, [leads]);
+  const selectLead = useCallback(
+    (id: string | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (id) params.set("leadId", id);
+      else params.delete("leadId");
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+      setEditing(false);
+    },
+    [pathname, router, searchParams],
+  );
 
   const refresh = useCallback(async () => {
     const response = await fetch("/api/leads", { cache: "no-store" });
@@ -125,7 +105,7 @@ export function ControlPanel() {
       if (!response.ok) throw new Error(data.error || "Generation failed.");
       if (data.lead) {
         setLeads((current) => current.map((lead) => (lead.id === id ? data.lead! : lead)));
-        setActiveId(id);
+        selectLead(id);
         setSubject(data.lead.subject ?? "");
         setBodyText(data.lead.bodyText ?? "");
       }
@@ -182,6 +162,7 @@ export function ControlPanel() {
       } else {
         await refresh();
       }
+      setEditing(false);
       if (data.warning) {
         toast.error(data.warning);
       } else if (data.mocked) {
@@ -198,154 +179,142 @@ export function ControlPanel() {
 
   const words = countWords(bodyText);
   const wordOk = wordCountOk(words);
+  const canEdit = Boolean(active && active.stage !== "SENT");
+  const isGenerating = Boolean(active && generatingId === active.id);
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
-      <header className="border-b border-zinc-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-5">
-          <div>
-            <p className="text-[11px] font-medium tracking-[0.22em] text-zinc-500 uppercase">
-              JR Intelligence
-            </p>
-            <h1 className="mt-1 text-xl font-medium tracking-tight text-zinc-950">Control Center</h1>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => void syncLeads()}
-            disabled={syncing}
-            className="rounded-md border-zinc-200"
-          >
-            {syncing ? <Loader2 className="animate-spin" /> : <RefreshCw />}
-            Sync leads
-          </Button>
+    <div className="flex h-svh min-h-0 flex-col bg-white">
+      <header className="flex shrink-0 items-center justify-between gap-4 border-b border-zinc-200 px-4 py-3 md:px-6">
+        <div>
+          <p className="text-[11px] font-medium tracking-[0.22em] text-zinc-500 uppercase">
+            JR Intelligence
+          </p>
+          <h1 className="text-base font-medium tracking-tight text-zinc-950">Control Center</h1>
         </div>
+        <Button
+          variant="outline"
+          onClick={() => void syncLeads()}
+          disabled={syncing}
+          className="rounded-md border-zinc-200"
+        >
+          {syncing ? <Loader2 className="animate-spin" /> : <RefreshCw />}
+          Sync leads
+        </Button>
       </header>
 
-      <main className="mx-auto max-w-7xl px-6 py-8">
-        {loading ? (
-          <div className="flex items-center gap-2 text-sm text-zinc-500">
-            <Loader2 className="size-4 animate-spin" />
-            Loading leads
-          </div>
-        ) : (
-          <div className="grid gap-4 lg:grid-cols-3">
-            {STAGES.map((stage) => (
-              <section key={stage.key} className="min-h-[70vh] rounded-lg border border-zinc-200 bg-white">
-                <div className="flex items-baseline justify-between border-b border-zinc-100 px-4 py-3">
-                  <h2 className="text-sm font-medium text-zinc-950">{stage.label}</h2>
-                  <span className="text-xs text-zinc-400">{grouped[stage.key].length}</span>
-                </div>
-                <div className="space-y-2 p-3">
-                  {grouped[stage.key].length === 0 ? (
-                    <p className="px-2 py-10 text-center text-sm text-zinc-400">
-                      Nothing in this stage.
-                    </p>
-                  ) : (
-                    grouped[stage.key].map((lead) => (
-                      <button
-                        key={lead.id}
-                        type="button"
-                        onClick={() => setActiveId(lead.id)}
-                        className={cn(
-                          "w-full rounded-md border border-zinc-200 bg-white px-3 py-3 text-left transition-colors hover:border-zinc-400 hover:bg-zinc-50",
-                          activeId === lead.id && "border-zinc-950",
-                        )}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <p className="text-sm font-medium text-zinc-950">{lead.companyName}</p>
-                          <span className="text-[10px] tracking-wide text-zinc-400 uppercase">
-                            {lead.language}
-                          </span>
-                        </div>
-                        <p className="mt-1 truncate text-xs text-zinc-500">{lead.industry}</p>
-                        <p className="mt-2 truncate text-xs text-zinc-400">{lead.email}</p>
-                      </button>
-                    ))
-                  )}
-                </div>
-              </section>
-            ))}
-          </div>
-        )}
-      </main>
+      <div className="flex min-h-0 flex-1">
+        <aside
+          className={cn(
+            "min-h-0 w-full shrink-0 overflow-y-auto border-zinc-200 bg-white md:w-[36%] md:border-r lg:w-[32%]",
+            active ? "hidden md:block" : "block",
+          )}
+        >
+          {loading ? (
+            <div className="flex items-center gap-2 px-4 py-8 text-sm text-zinc-500">
+              <Loader2 className="size-4 animate-spin" />
+              Loading leads
+            </div>
+          ) : leads.length === 0 ? (
+            <p className="px-4 py-10 text-sm text-zinc-500">
+              No leads yet. Sync to pull pending contacts from the dashboard.
+            </p>
+          ) : (
+            <LeadList
+              leads={leads}
+              activeId={activeId}
+              generatingId={generatingId}
+              onSelect={selectLead}
+            />
+          )}
+        </aside>
 
-      <Sheet open={Boolean(active)} onOpenChange={(open) => !open && setActiveId(null)}>
-        <SheetContent className="w-full overflow-y-auto sm:max-w-xl">
-          {active ? (
-            <div className="flex h-full flex-col">
-              <SheetHeader className="text-left">
-                <SheetTitle className="text-lg font-medium">{active.companyName}</SheetTitle>
-                <SheetDescription>
-                  {active.industry} · {active.email}
-                </SheetDescription>
-              </SheetHeader>
-
-              <div className="mt-6 flex flex-wrap gap-2">
-                {active.stage !== "SENT" ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => void generateDraft(active.id)}
-                    disabled={generatingId === active.id}
-                    className="rounded-md"
-                  >
-                    {generatingId === active.id ? <Loader2 className="animate-spin" /> : <Sparkles />}
-                    {generatingId === active.id
-                      ? "Analyzing webshop & generating..."
-                      : "Generate draft"}
-                  </Button>
-                ) : null}
-                {active.stage !== "SENT" && (active.bodyText || bodyText) ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => void saveDraft()}
-                    disabled={saving}
-                    className="rounded-md"
-                  >
-                    {saving ? <Loader2 className="animate-spin" /> : null}
-                    Save edits
-                  </Button>
-                ) : null}
-                {active.stage !== "SENT" && bodyText ? (
-                  <Button
-                    size="sm"
-                    onClick={() => void sendComplete()}
-                    disabled={sending}
-                    className="rounded-md"
-                  >
-                    {sending ? <Loader2 className="animate-spin" /> : <Send />}
-                    Send & complete
-                  </Button>
-                ) : null}
+        <section
+          className={cn(
+            "flex min-h-0 min-w-0 flex-1 flex-col bg-[#fafafa]",
+            active ? "flex" : "hidden md:flex",
+          )}
+        >
+          {!active ? (
+            <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
+              <p className="text-[11px] font-medium tracking-[0.18em] text-zinc-400 uppercase">
+                Inbox
+              </p>
+              <p className="mt-3 text-sm text-zinc-500">Select a lead to view</p>
+            </div>
+          ) : (
+            <>
+              <div className="sticky top-0 z-20 flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-zinc-200 bg-white/95 px-4 py-3 backdrop-blur md:px-6">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      className="md:hidden"
+                      onClick={() => selectLead(null)}
+                      aria-label="Back to leads"
+                    >
+                      <ArrowLeft />
+                    </Button>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-zinc-950">{active.companyName}</p>
+                      <p className="truncate text-xs text-zinc-500">
+                        {active.industry} · {active.email}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {canEdit ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => void generateDraft(active.id)}
+                      disabled={isGenerating}
+                      className="rounded-md"
+                    >
+                      {isGenerating ? <Loader2 className="animate-spin" /> : <Sparkles />}
+                      {isGenerating ? "Analyzing webshop & generating..." : "Regenerate"}
+                    </Button>
+                  ) : null}
+                  {canEdit && (active.bodyText || bodyText) ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditing((open) => !open)}
+                      className="rounded-md"
+                    >
+                      <Pencil />
+                      {editing ? "Close editor" : "Edit Email"}
+                    </Button>
+                  ) : null}
+                  {canEdit && bodyText ? (
+                    <Button
+                      size="sm"
+                      onClick={() => void sendComplete()}
+                      disabled={sending}
+                      className="rounded-md"
+                    >
+                      {sending ? <Loader2 className="animate-spin" /> : <Send />}
+                      Send via SMTP
+                    </Button>
+                  ) : null}
+                </div>
               </div>
 
-              {generatingId === active.id ? (
-                <p className="mt-4 text-sm leading-6 text-zinc-500">
+              {isGenerating ? (
+                <p className="border-b border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-500 md:px-6">
                   Analyzing webshop & generating...
                 </p>
               ) : null}
 
-              {active.error && generatingId !== active.id ? (
-                <p className="mt-4 border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
+              {active.error && !isGenerating ? (
+                <p className="border-b border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-700 md:px-6">
                   {active.error}
                 </p>
               ) : null}
 
-              <Separator className="my-6" />
-
-              {generatingId === active.id ? (
-                <p className="text-sm leading-6 text-zinc-500">
-                  Analyzing webshop & generating...
-                </p>
-              ) : active.stage === "PENDING_GENERATION" && !bodyText ? (
-                <p className="text-sm leading-6 text-zinc-500">
-                  Generate a draft to audit this site in {active.language === "nl" ? "Dutch" : "English"}:
-                  greeting, JR Intelligence intro, three specific bullets, a short solution, then a soft CTA.
-                  Target 85–150 words.
-                </p>
-              ) : (
-                <div className="space-y-4">
+              {editing && canEdit ? (
+                <div className="shrink-0 space-y-3 border-b border-zinc-200 bg-white px-4 py-4 md:px-6">
                   <div className="space-y-2">
                     <label className="text-xs font-medium tracking-wide text-zinc-500 uppercase">
                       Subject
@@ -353,7 +322,6 @@ export function ControlPanel() {
                     <Input
                       value={subject}
                       onChange={(event) => setSubject(event.target.value)}
-                      disabled={active.stage === "SENT"}
                       className="rounded-md"
                     />
                   </div>
@@ -369,33 +337,60 @@ export function ControlPanel() {
                     <Textarea
                       value={bodyText}
                       onChange={(event) => setBodyText(event.target.value)}
-                      disabled={active.stage === "SENT"}
-                      className="min-h-48 rounded-md font-[inherit] text-sm leading-6"
+                      className="min-h-36 rounded-md font-[inherit] text-sm leading-6"
                     />
                   </div>
-                  {active.html ? (
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium tracking-wide text-zinc-500 uppercase">
-                        Preview
-                      </p>
-                      <ScrollArea className="h-80 rounded-md border border-zinc-200 bg-white">
-                        <iframe
-                          title="Email preview"
-                          className="h-[640px] w-full bg-white"
-                          srcDoc={htmlForPreview(
-                            active.html,
-                            typeof window !== "undefined" ? window.location.origin : "",
-                          )}
-                        />
-                      </ScrollArea>
-                    </div>
-                  ) : null}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => void saveDraft()}
+                    disabled={saving}
+                    className="rounded-md"
+                  >
+                    {saving ? <Loader2 className="animate-spin" /> : null}
+                    Save edits
+                  </Button>
                 </div>
-              )}
-            </div>
-          ) : null}
-        </SheetContent>
-      </Sheet>
+              ) : null}
+
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                {isGenerating ? (
+                  <div className="flex h-full items-center justify-center px-8 text-sm text-zinc-500">
+                    Analyzing webshop & generating...
+                  </div>
+                ) : active.html ? (
+                  <EmailPreview
+                    key={`${active.id}-${active.generatedAt ?? ""}-${active.html.length}`}
+                    html={active.html}
+                    title={`${active.companyName} email`}
+                  />
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center px-8 text-center">
+                    <p className="text-sm text-zinc-600">
+                      No draft yet. Generate one to audit this site in{" "}
+                      {active.language === "nl" ? "Dutch" : "English"}.
+                    </p>
+                    <p className="mt-2 max-w-md text-xs leading-5 text-zinc-400">
+                      Greeting, JR Intelligence intro, three specific bullets, a short solution, then a
+                      soft CTA. Target 85–150 words.
+                    </p>
+                    {canEdit ? (
+                      <Button
+                        className="mt-5 rounded-md"
+                        onClick={() => void generateDraft(active.id)}
+                        disabled={isGenerating}
+                      >
+                        {isGenerating ? <Loader2 className="animate-spin" /> : <Sparkles />}
+                        Generate draft
+                      </Button>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
