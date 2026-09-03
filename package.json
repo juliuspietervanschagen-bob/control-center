@@ -1,0 +1,35 @@
+{
+  "name": "jr-intelligence-outreach",
+  "version": "1.0.0",
+  "description": "Modular B2B email outreach system for JR Intelligence.",
+  "private": true,
+  "main": "build/main.js",
+  "scripts": {
+    "build": "tsc",
+    "dry-run": "ts-node src/main.ts --dry-run --preview",
+    "send": "ts-node src/main.ts",
+    "preview": "ts-node src/preview/server.ts",
+    "start": "ts-node src/main.ts --dry-run --preview"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "outreach",
+    "email",
+    "b2b",
+    "jr-intelligence"
+  ],
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@types/node": "^26.4.1",
+    "@types/nodemailer": "^8.0.1",
+    "csv-parser": "^3.2.1",
+    "dotenv": "^17.4.2",
+    "juice": "^12.1.2",
+    "nodemailer": "^9.1.1",
+    "openai": "^7.9.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

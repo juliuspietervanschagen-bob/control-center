@@ -1,0 +1,7 @@
+node_modules/
+build/
+dist/
+.env
+campaign_state.json
+*.log
+.DS_Store
