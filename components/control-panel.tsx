@@ -117,6 +117,7 @@ export function ControlPanel() {
   async function generateDraft(id: string) {
     setGeneratingId(id);
     const toastId = toast.loading("Analyzing webshop & generating...");
+    const started = Date.now();
     try {
       const response = await fetch(`/api/leads/${id}/generate`, { method: "POST" });
       const data = (await response.json()) as { lead?: LeadRecord; error?: string };
@@ -127,6 +128,8 @@ export function ControlPanel() {
         setSubject(data.lead.subject ?? "");
         setBodyText(data.lead.bodyText ?? "");
       }
+      const hold = 900 - (Date.now() - started);
+      if (hold > 0) await new Promise((resolve) => setTimeout(resolve, hold));
       toast.success("Draft ready for review.", { id: toastId });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Generation failed.", { id: toastId });
