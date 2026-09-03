@@ -28,9 +28,15 @@ Without real SMTP credentials, keep `SMTP_MOCK=true`. Set it to `false` and fill
 
 Outbound HTML includes a CID-linked signature image (`cid:jrsignature` → `public/assets/image_029d84.jpg`). Nodemailer attaches the JPEG inline — not as Base64 in the HTML — so clients render it without spam-prone data URIs. Replace that file in place to update the signature art.
 
+## Email template
+
+Outbound HTML sits on a 100% `#fafafa` wrapper with an inline SVG dot-grid (data URI, no remote images). The 600px card stays solid white (`#ffffff`) so copy stays readable. Outlook gets `bgcolor="#fafafa"` plus MSO ghost tables.
+
+Open `http://127.0.0.1:43149/email-preview.html` for a static sample.
+
 ## Skills
 
-`.cursor/skills/` governs copy, HTML, compliance, dashboard sync, signature embedding, and this UI.
+`.cursor/skills/` governs copy, HTML, compliance, dashboard sync, signature embedding, email UI, and this UI.
 
 ## CLI (still available)
 

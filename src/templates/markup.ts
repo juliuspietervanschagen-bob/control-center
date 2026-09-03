@@ -1,6 +1,13 @@
 import type { LanguagePreference, Lead } from "../config/types";
 import { config } from "../config/env";
-import { geometricPatternDataUri } from "./pattern";
+import {
+  BODY_TEXT_COLOR,
+  CARD_BACKGROUND,
+  CARD_BORDER,
+  PATTERN_BASE_COLOR,
+  geometricPatternDataUri,
+  shellBackgroundStyle,
+} from "./pattern";
 import { signatureBlock } from "../../lib/signature";
 
 function escapeHtml(value: string): string {
@@ -81,6 +88,7 @@ export function buildEmailMarkup(input: {
   bodyText: string;
 }): string {
   const pattern = geometricPatternDataUri();
+  const shellStyle = shellBackgroundStyle();
   const optOut = optOutCopy(input.lead.languagePreference);
   const bodyHtml = bodyToHtml(stripTrailingSignoff(input.bodyText));
   const previewText =
@@ -89,21 +97,33 @@ export function buildEmailMarkup(input: {
       : `A short note from JR Intelligence for ${input.lead.companyName}.`;
 
   return `<!DOCTYPE html>
-<html lang="${input.lead.languagePreference}">
+<html lang="${input.lead.languagePreference}" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
   <title>${escapeHtml(input.subject)}</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
   <style>
     body {
       margin: 0;
       padding: 0;
-      background-color: #ffffff;
-      background-image: url("${pattern}");
+      background-color: ${PATTERN_BASE_COLOR};
+      background-image: url('${pattern}');
       background-repeat: repeat;
+      background-size: 20px 20px;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      color: #18181b;
+      color: ${BODY_TEXT_COLOR};
     }
     .preheader {
       display: none;
@@ -116,25 +136,27 @@ export function buildEmailMarkup(input: {
     }
     .shell {
       width: 100%;
-      background-color: #ffffff;
-      background-image: url("${pattern}");
+      background-color: ${PATTERN_BASE_COLOR};
+      background-image: url('${pattern}');
       background-repeat: repeat;
+      background-size: 20px 20px;
     }
     .card {
       width: 100%;
       max-width: 600px;
-      background-color: #ffffff;
-      border: 1px solid #f4f4f5;
+      background-color: ${CARD_BACKGROUND};
+      border: 1px solid ${CARD_BORDER};
+      border-radius: 8px;
     }
     .brand {
       font-size: 13px;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #3f3f46;
+      color: #6b7280;
       font-weight: 600;
     }
     .rule {
-      border-top: 1px solid #e4e4e7;
+      border-top: 1px solid ${CARD_BORDER};
       font-size: 1px;
       line-height: 1px;
     }
@@ -142,7 +164,7 @@ export function buildEmailMarkup(input: {
       margin: 0 0 16px 0;
       font-size: 16px;
       line-height: 1.6;
-      color: #18181b;
+      color: ${BODY_TEXT_COLOR};
     }
     .audit-list {
       margin: 0 0 16px 0;
@@ -152,51 +174,54 @@ export function buildEmailMarkup(input: {
       margin: 0 0 8px 0;
       font-size: 16px;
       line-height: 1.55;
-      color: #18181b;
+      color: ${BODY_TEXT_COLOR};
     }
     .signoff {
       margin: 8px 0 0 0;
       font-size: 16px;
       line-height: 1.6;
-      color: #18181b;
+      color: ${BODY_TEXT_COLOR};
     }
     .footer-copy {
       margin: 0 0 8px 0;
       font-size: 12px;
       line-height: 1.5;
-      color: #71717a;
+      color: #6b7280;
     }
     .optout a {
-      color: #52525b;
+      color: #4b5563;
       text-decoration: underline;
     }
   </style>
 </head>
-<body>
+<body bgcolor="${PATTERN_BASE_COLOR}" style="${shellStyle};margin:0;padding:0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:${BODY_TEXT_COLOR};">
   <div class="preheader">${escapeHtml(previewText)}</div>
-  <table class="shell" role="presentation" width="100%" cellpadding="0" cellspacing="0">
+  <table class="shell" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${PATTERN_BASE_COLOR}" style="${shellStyle};width:100%;">
     <tr>
-      <td align="center" style="padding: 32px 16px;">
-        <table class="card" role="presentation" width="600" cellpadding="0" cellspacing="0">
+      <td align="center" valign="top" bgcolor="${PATTERN_BASE_COLOR}" style="${shellStyle};padding:20px 16px;">
+        <!--[if mso]>
+        <table role="presentation" align="center" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td width="600" bgcolor="${CARD_BACKGROUND}">
+        <![endif]-->
+        <table class="card" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="${CARD_BACKGROUND}" style="width:100%;max-width:600px;margin:0 auto;background-color:${CARD_BACKGROUND};border:1px solid ${CARD_BORDER};border-radius:8px;">
           <tr>
-            <td style="padding: 28px 36px 12px 36px;">
+            <td style="padding:40px 40px 16px 40px;background-color:${CARD_BACKGROUND};border-radius:8px 8px 0 0;">
               <p class="brand">JR Intelligence</p>
             </td>
           </tr>
           <tr>
-            <td class="rule" style="padding: 0 36px;">&nbsp;</td>
+            <td class="rule" style="padding:0 40px;background-color:${CARD_BACKGROUND};">&nbsp;</td>
           </tr>
           <tr>
-            <td style="padding: 24px 36px 8px 36px;">
+            <td style="padding:24px 40px 8px 40px;background-color:${CARD_BACKGROUND};">
               ${bodyHtml}
               ${signatureBlock(input.lead.languagePreference)}
             </td>
           </tr>
           <tr>
-            <td class="rule" style="padding: 8px 36px 0 36px;">&nbsp;</td>
+            <td class="rule" style="padding:8px 40px 0 40px;background-color:${CARD_BACKGROUND};">&nbsp;</td>
           </tr>
           <tr>
-            <td class="optout" style="padding: 16px 36px 28px 36px;">
+            <td class="optout" style="padding:16px 40px 40px 40px;background-color:${CARD_BACKGROUND};border-radius:0 0 8px 8px;">
               <p class="footer-copy">${escapeHtml(optOut.line)}</p>
               <p class="footer-copy">
                 <a href="mailto:${escapeHtml(config.optOutEmail)}?subject=${encodeURIComponent(optOut.label)}">${escapeHtml(optOut.label)}</a>
@@ -206,6 +231,9 @@ export function buildEmailMarkup(input: {
             </td>
           </tr>
         </table>
+        <!--[if mso]>
+        </td></tr></table>
+        <![endif]-->
       </td>
     </tr>
   </table>
