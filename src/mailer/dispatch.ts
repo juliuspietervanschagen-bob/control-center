@@ -38,6 +38,7 @@ export async function dispatchEmail(
       subject: email.subject,
       sentAt: new Date().toISOString(),
       dryRun: true,
+      dashboardId: email.lead.dashboardId,
     });
     return { status: "dry-run", path: filePath };
   }
@@ -63,6 +64,7 @@ export async function dispatchEmail(
     sentAt: new Date().toISOString(),
     dryRun: false,
     messageId: info.messageId,
+    dashboardId: email.lead.dashboardId,
   });
 
   return { status: "sent", messageId: info.messageId };

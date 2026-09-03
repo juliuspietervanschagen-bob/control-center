@@ -9,7 +9,10 @@
     "dry-run": "ts-node src/main.ts --dry-run --preview",
     "send": "ts-node src/main.ts",
     "preview": "ts-node src/preview/server.ts",
-    "start": "ts-node src/main.ts --dry-run --preview"
+    "start": "ts-node src/main.ts --dry-run --preview",
+    "start:worker": "ts-node src/main.ts --worker",
+    "test:dashboard": "ts-node src/main.ts --test-dashboard",
+    "mock:dashboard": "ts-node src/mock/dashboardServer.ts"
   },
   "engines": {
     "node": ">=20"
@@ -23,10 +26,12 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@types/node": "^26.4.1",
+    "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^8.0.1",
     "csv-parser": "^3.2.1",
     "dotenv": "^17.4.2",
     "juice": "^12.1.2",
+    "node-cron": "^4.6.0",
     "nodemailer": "^9.1.1",
     "openai": "^7.9.0",
     "ts-node": "^10.9.2",

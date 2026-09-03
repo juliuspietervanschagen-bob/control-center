@@ -8,8 +8,9 @@ import {
   writeGalleryIndex,
 } from "./mailer/dispatch";
 import { startPreviewServer } from "./preview/server";
+import { runDashboardTest, startWorker } from "./worker";
 
-async function main(): Promise<void> {
+async function runCsvCampaign(): Promise<void> {
   const options = parseCliArgs(process.argv.slice(2));
   const leadsPath = options.leadsPath ?? config.leadsCsv;
   const allLeads = await parseLeadsCsv(leadsPath);
@@ -58,6 +59,24 @@ async function main(): Promise<void> {
     startPreviewServer();
     console.log(`Preview: http://127.0.0.1:${config.previewPort}`);
   }
+}
+
+async function main(): Promise<void> {
+  const options = parseCliArgs(process.argv.slice(2));
+
+  if (options.command === "worker") {
+    await startWorker();
+    return;
+  }
+
+  if (options.command === "test-dashboard") {
+    await runDashboardTest();
+    startPreviewServer();
+    console.log(`Preview: http://127.0.0.1:${config.previewPort}`);
+    return;
+  }
+
+  await runCsvCampaign();
 }
 
 main().catch((error: unknown) => {

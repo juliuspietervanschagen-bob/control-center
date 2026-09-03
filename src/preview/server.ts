@@ -40,6 +40,13 @@ export function startPreviewServer(port = config.previewPort): http.Server {
   });
 
   server.listen(port, "0.0.0.0");
+  server.on("error", (error: NodeJS.ErrnoException) => {
+    if (error.code === "EADDRINUSE") {
+      console.log(`Preview already running on http://127.0.0.1:${port}`);
+      return;
+    }
+    throw error;
+  });
   return server;
 }
 

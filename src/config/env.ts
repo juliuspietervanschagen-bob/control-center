@@ -45,6 +45,13 @@ export const config = {
   jitterMinMinutes: envNumber("JITTER_MIN_MINUTES", 3),
   jitterMaxMinutes: envNumber("JITTER_MAX_MINUTES", 9),
   previewPort: envNumber("PREVIEW_PORT", 43147),
+  dashboardApiUrl: envString("DASHBOARD_API_URL", "http://127.0.0.1:43148"),
+  dashboardApiKey: envString("DASHBOARD_API_KEY", "jr-dev-dashboard-key"),
+  dashboardLeadsPath: envString("DASHBOARD_LEADS_PATH", "/api/leads"),
+  dashboardPollMinutes: envNumber("DASHBOARD_POLL_MINUTES", 12),
+  dashboardMockPort: envNumber("DASHBOARD_MOCK_PORT", 43148),
+  dashboardUseMock: envBool("DASHBOARD_USE_MOCK", true),
+  dashboardTimeoutMs: envNumber("DASHBOARD_TIMEOUT_MS", 20_000),
 };
 
 export function hasOpenAiKey(): boolean {

@@ -1,9 +1,11 @@
+export function randomInterval(minMs: number, maxMs: number): number {
+  const min = Math.min(minMs, maxMs);
+  const max = Math.max(minMs, maxMs);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 export function randomJitterMs(minMinutes: number, maxMinutes: number): number {
-  const min = Math.min(minMinutes, maxMinutes);
-  const max = Math.max(minMinutes, maxMinutes);
-  const minMs = Math.round(min * 60_000);
-  const maxMs = Math.round(max * 60_000);
-  return Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
+  return randomInterval(Math.round(minMinutes * 60_000), Math.round(maxMinutes * 60_000));
 }
 
 export function formatDuration(ms: number): string {

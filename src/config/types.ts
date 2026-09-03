@@ -5,6 +5,8 @@ export interface Lead {
   contactEmail: string;
   industry: string;
   languagePreference: LanguagePreference;
+  dashboardId?: string;
+  website?: string;
 }
 
 export interface GeneratedEmail {
@@ -23,9 +25,13 @@ export interface CampaignRecord {
   sentAt: string;
   dryRun: boolean;
   messageId?: string;
+  dashboardId?: string;
 }
 
+export type WorkerCommand = "csv" | "worker" | "test-dashboard";
+
 export interface CliOptions {
+  command: WorkerCommand;
   dryRun: boolean;
   preview: boolean;
   force: boolean;

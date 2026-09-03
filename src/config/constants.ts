@@ -29,4 +29,10 @@ export const SKILL_NAMES = {
   context: "context-injector",
   template: "html-template-designer",
   dispatch: "compliance-and-dispatch",
+  dashboard: "dashboard-extractor",
+  worker: "queue-worker-manager",
 } as const;
+
+export const PENDING_LEAD_STATUSES = ["PENDING", "UNCONTACTED"] as const;
+export const SUCCESS_LEAD_STATUS = "CONTACTED" as const;
+export const FAILED_LEAD_STATUS = "FAILED" as const;

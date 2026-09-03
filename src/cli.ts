@@ -2,6 +2,7 @@ import type { CliOptions } from "./config/types";
 
 export function parseCliArgs(argv: string[]): CliOptions {
   const options: CliOptions = {
+    command: "csv",
     dryRun: false,
     preview: false,
     force: false,
@@ -10,7 +11,9 @@ export function parseCliArgs(argv: string[]): CliOptions {
 
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === "--dry-run") options.dryRun = true;
+    if (arg === "--worker") options.command = "worker";
+    else if (arg === "--test-dashboard") options.command = "test-dashboard";
+    else if (arg === "--dry-run") options.dryRun = true;
     else if (arg === "--preview") options.preview = true;
     else if (arg === "--force") options.force = true;
     else if (arg === "--skip-jitter") options.skipJitter = true;
