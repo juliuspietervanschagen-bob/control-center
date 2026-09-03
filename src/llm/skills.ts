@@ -12,12 +12,6 @@ export function loadSkill(name: SkillName): string {
   return fs.readFileSync(skillPath, "utf8").trim();
 }
 
-export function loadOutreachSkills(): {
-  copywriter: string;
-  context: string;
-} {
-  return {
-    copywriter: loadSkill(SKILL_NAMES.copywriter),
-    context: loadSkill(SKILL_NAMES.context),
-  };
+export function loadEmailGenerationSkill(): string {
+  return loadSkill(SKILL_NAMES.emailGeneration);
 }

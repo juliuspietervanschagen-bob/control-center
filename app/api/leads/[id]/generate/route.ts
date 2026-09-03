@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { generateDraft } from "@/lib/ai";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 export async function POST(
   _request: Request,

@@ -18,7 +18,7 @@ If `DASHBOARD_USE_MOCK=true`, the app starts a local dashboard API on port 43148
 ## Flow
 
 1. **Sync leads** — pulls pending/uncontacted (and known) leads into SQLite.
-2. **Generate draft** — 100–200 word EN/NL note with the Rik & Julius introduction, wrapped in inlined HTML.
+2. **Generate draft** — Jina reads the live site, then a 85–150 word EN/NL note: intro, three audit bullets, solution, soft CTA, inlined HTML.
 3. **Review / edit** — subject and body in the side panel; save to recompile HTML.
 4. **Send & complete** — Nodemailer SMTP, then PATCH the external dashboard to `CONTACTED`.
 

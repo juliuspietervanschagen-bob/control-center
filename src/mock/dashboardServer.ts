@@ -58,6 +58,7 @@ const seedLeads: DashboardLead[] = [
     email: "studio@lumenlighting.example",
     industry: "interior lighting",
     language_preference: "en",
+    website: "https://www.allbirds.com",
     status: "UNCONTACTED",
   },
 ];

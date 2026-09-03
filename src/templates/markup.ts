@@ -10,16 +10,46 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function paragraphsFromBody(bodyText: string): string {
-  return bodyText
-    .split(/\n{2,}/)
-    .map((block) => block.trim())
-    .filter(Boolean)
-    .map((block) => {
-      const html = escapeHtml(block).replace(/\n/g, "<br>");
-      return `<p class="body-copy">${html}</p>`;
-    })
-    .join("\n");
+function bodyToHtml(bodyText: string): string {
+  const lines = bodyText.replace(/\r\n/g, "\n").split("\n");
+  const html: string[] = [];
+  let paragraph: string[] = [];
+  let bullets: string[] = [];
+
+  const flushParagraph = () => {
+    if (paragraph.length === 0) return;
+    const inner = escapeHtml(paragraph.join("\n")).replace(/\n/g, "<br>");
+    html.push(`<p class="body-copy">${inner}</p>`);
+    paragraph = [];
+  };
+
+  const flushBullets = () => {
+    if (bullets.length === 0) return;
+    const items = bullets
+      .map((item) => `<li>${escapeHtml(item)}</li>`)
+      .join("");
+    html.push(`<ul class="audit-list">${items}</ul>`);
+    bullets = [];
+  };
+
+  for (const raw of lines) {
+    const match = raw.match(/^\s*[-*•]\s+(.+)$/);
+    if (match?.[1]) {
+      flushParagraph();
+      bullets.push(match[1]);
+      continue;
+    }
+    if (raw.trim() === "") {
+      flushParagraph();
+      flushBullets();
+      continue;
+    }
+    flushBullets();
+    paragraph.push(raw);
+  }
+  flushParagraph();
+  flushBullets();
+  return html.join("\n");
 }
 
 function optOutCopy(language: LanguagePreference): { label: string; line: string } {
@@ -42,7 +72,7 @@ export function buildEmailMarkup(input: {
 }): string {
   const pattern = geometricPatternDataUri();
   const optOut = optOutCopy(input.lead.languagePreference);
-  const bodyHtml = paragraphsFromBody(input.bodyText);
+  const bodyHtml = bodyToHtml(input.bodyText);
   const previewText =
     input.lead.languagePreference === "nl"
       ? `Kort bericht van JR Intelligence voor ${input.lead.companyName}.`
@@ -102,6 +132,16 @@ export function buildEmailMarkup(input: {
       margin: 0 0 16px 0;
       font-size: 16px;
       line-height: 1.6;
+      color: #18181b;
+    }
+    .audit-list {
+      margin: 0 0 16px 0;
+      padding: 0 0 0 20px;
+    }
+    .audit-list li {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      line-height: 1.55;
       color: #18181b;
     }
     .footer-copy {

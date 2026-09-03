@@ -3,6 +3,7 @@ import { orchestrateEmail } from "../src/llm/orchestrator";
 import { wordCount } from "../src/llm/constraints";
 import type { Lead } from "../src/config/types";
 import type { LanguagePreference } from "../src/config/types";
+import { analyzeWebsite } from "./scraper";
 
 export async function generateDraft(input: {
   companyName: string;
@@ -12,13 +13,15 @@ export async function generateDraft(input: {
   website?: string | null;
   dashboardId: string;
 }) {
+  const analysis = await analyzeWebsite(input.website);
   const lead: Lead = {
     companyName: input.companyName,
     contactEmail: input.email,
     industry: input.industry,
     languagePreference: input.language === "nl" ? "nl" : "en",
-    website: input.website ?? undefined,
+    website: analysis.url ?? input.website ?? undefined,
     dashboardId: input.dashboardId,
+    siteMarkdown: analysis.markdown,
   };
   const generated = await orchestrateEmail(lead);
   return {
@@ -27,6 +30,7 @@ export async function generateDraft(input: {
     html: generated.html,
     wordCount: generated.wordCount,
     composer: generated.composer,
+    analysisSource: analysis.source,
   };
 }
 

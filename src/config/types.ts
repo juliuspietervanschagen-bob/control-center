@@ -7,6 +7,7 @@ export interface Lead {
   languagePreference: LanguagePreference;
   dashboardId?: string;
   website?: string;
+  siteMarkdown?: string;
 }
 
 export interface GeneratedEmail {

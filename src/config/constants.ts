@@ -20,8 +20,8 @@ export const BANNED_PHRASES = [
   "hope this finds you well",
 ] as const;
 
-export const MIN_BODY_WORDS = 100;
-export const MAX_BODY_WORDS = 200;
+export const MIN_BODY_WORDS = 85;
+export const MAX_BODY_WORDS = 150;
 export const MAX_SUBJECT_WORDS = 6;
 
 export const SKILL_NAMES = {
@@ -31,6 +31,8 @@ export const SKILL_NAMES = {
   dispatch: "compliance-and-dispatch",
   dashboard: "dashboard-extractor",
   worker: "queue-worker-manager",
+  emailGeneration: "ai-email-generation",
+  analyzer: "website-analyzer-engine",
 } as const;
 
 export const PENDING_LEAD_STATUSES = ["PENDING", "UNCONTACTED"] as const;

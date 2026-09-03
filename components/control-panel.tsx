@@ -44,6 +44,10 @@ function countWords(text: string): number {
   return text.replace(/\s+/g, " ").trim().split(" ").filter(Boolean).length;
 }
 
+function wordCountOk(count: number): boolean {
+  return count >= 85 && count <= 150;
+}
+
 async function readError(response: Response): Promise<string> {
   try {
     const data = (await response.json()) as { error?: string };
@@ -112,6 +116,7 @@ export function ControlPanel() {
 
   async function generateDraft(id: string) {
     setGeneratingId(id);
+    const toastId = toast.loading("Analyzing webshop & generating...");
     try {
       const response = await fetch(`/api/leads/${id}/generate`, { method: "POST" });
       const data = (await response.json()) as { lead?: LeadRecord; error?: string };
@@ -122,9 +127,9 @@ export function ControlPanel() {
         setSubject(data.lead.subject ?? "");
         setBodyText(data.lead.bodyText ?? "");
       }
-      toast.success("Draft ready for review.");
+      toast.success("Draft ready for review.", { id: toastId });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Generation failed.");
+      toast.error(error instanceof Error ? error.message : "Generation failed.", { id: toastId });
     } finally {
       setGeneratingId(null);
     }
@@ -188,7 +193,7 @@ export function ControlPanel() {
   }
 
   const words = countWords(bodyText);
-  const wordOk = words >= 100 && words <= 200;
+  const wordOk = wordCountOk(words);
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
@@ -281,7 +286,9 @@ export function ControlPanel() {
                     className="rounded-md"
                   >
                     {generatingId === active.id ? <Loader2 className="animate-spin" /> : <Sparkles />}
-                    Generate draft
+                    {generatingId === active.id
+                      ? "Analyzing webshop & generating..."
+                      : "Generate draft"}
                   </Button>
                 ) : null}
                 {active.stage !== "SENT" && (active.bodyText || bodyText) ? (
@@ -309,7 +316,13 @@ export function ControlPanel() {
                 ) : null}
               </div>
 
-              {active.error ? (
+              {generatingId === active.id ? (
+                <p className="mt-4 text-sm leading-6 text-zinc-500">
+                  Analyzing webshop & generating...
+                </p>
+              ) : null}
+
+              {active.error && generatingId !== active.id ? (
                 <p className="mt-4 border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700">
                   {active.error}
                 </p>
@@ -317,10 +330,15 @@ export function ControlPanel() {
 
               <Separator className="my-6" />
 
-              {active.stage === "PENDING_GENERATION" && !bodyText ? (
+              {generatingId === active.id ? (
                 <p className="text-sm leading-6 text-zinc-500">
-                  Generate a draft to write a 100–200 word note in {active.language === "nl" ? "Dutch" : "English"},
-                  including the JR Intelligence introduction.
+                  Analyzing webshop & generating...
+                </p>
+              ) : active.stage === "PENDING_GENERATION" && !bodyText ? (
+                <p className="text-sm leading-6 text-zinc-500">
+                  Generate a draft to audit this site in {active.language === "nl" ? "Dutch" : "English"}:
+                  greeting, JR Intelligence intro, three specific bullets, a short solution, then a soft CTA.
+                  Target 85–150 words.
                 </p>
               ) : (
                 <div className="space-y-4">
@@ -341,7 +359,7 @@ export function ControlPanel() {
                         Body
                       </label>
                       <span className={cn("text-xs", wordOk ? "text-zinc-400" : "text-zinc-950")}>
-                        {words} words
+                        {words} / 85–150
                       </span>
                     </div>
                     <Textarea
