@@ -7,7 +7,7 @@ import type { GeneratedEmail } from "./config/types";
 import { hasBeenEmailed, markProcessedLeadId } from "./db/campaignState";
 import { isProcessed, loadIdempotencyCache, rememberProcessed } from "./db/idempotency";
 import { orchestrateEmail } from "./llm/orchestrator";
-import { dispatchEmail, writeGalleryIndex } from "./mailer/dispatch";
+import { dispatchEmail } from "./mailer/dispatch";
 import { formatDuration, randomInterval, wait } from "./mailer/jitter";
 import { dashboardIsReachable, startMockDashboard } from "./mock/dashboardServer";
 
@@ -101,7 +101,11 @@ async function runQueue(options: { dryRun: boolean; limit?: number }): Promise<G
   const batch =
     typeof options.limit === "number" ? due.slice(0, Math.max(0, options.limit)) : due;
 
-  console.log(`Dashboard pending: ${pending.length} · due after idempotency: ${batch.length}`);
+  console.log(
+    `Dashboard pending: ${pending.length} · due after idempotency: ${due.length}${
+      typeof options.limit === "number" ? ` · taking ${batch.length}` : ""
+    }`,
+  );
 
   const generated: GeneratedEmail[] = [];
   for (const [index, lead] of batch.entries()) {
@@ -127,8 +131,6 @@ export async function runDashboardTest(): Promise<void> {
     console.log("No pending uncontacted leads to preview.");
     return;
   }
-  const gallery = writeGalleryIndex(generated);
-  console.log(`Gallery: ${gallery}`);
   console.log("Test complete. Email saved locally. Dashboard status was not updated. Nothing was sent.");
 }
 
