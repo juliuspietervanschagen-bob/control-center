@@ -8,7 +8,8 @@ export function signatureFilePath(): string {
 }
 
 export function signatureImgTag(): string {
-  return `<img src="cid:${SIGNATURE_CID}" alt="JR Signature" width="120" style="display:block;margin-top:10px;max-width:120px;height:auto;border:0;outline:none;">`;
+  // Match signature-embedder skill (width ~150) while staying compact in the footer.
+  return `<img src="cid:${SIGNATURE_CID}" alt="JR Signature" width="150" style="display:block;margin-top:10px;max-width:150px;height:auto;border:0;outline:none;">`;
 }
 
 export function signatureBlock(language: "en" | "nl"): string {
@@ -34,8 +35,17 @@ export function signatureAttachment(): {
 }
 
 export function htmlForPreview(html: string, origin = ""): string {
-  const src = origin
-    ? `${origin.replace(/\/+$/, "")}/assets/${SIGNATURE_FILENAME}`
+  const base = origin.replace(/\/+$/, "");
+  const src = base
+    ? `${base}/assets/${SIGNATURE_FILENAME}`
     : `/assets/${SIGNATURE_FILENAME}`;
-  return html.replaceAll(`cid:${SIGNATURE_CID}`, src);
+  let preview = html.replaceAll(`cid:${SIGNATURE_CID}`, src);
+  // srcDoc iframes resolve relative URLs unreliably; pin an absolute base when we have one.
+  if (base && !/<base\s/i.test(preview)) {
+    preview = preview.replace(
+      /<head([^>]*)>/i,
+      `<head$1><base href="${base}/">`,
+    );
+  }
+  return preview;
 }

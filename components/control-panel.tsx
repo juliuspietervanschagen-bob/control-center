@@ -382,7 +382,10 @@ export function ControlPanel() {
                         <iframe
                           title="Email preview"
                           className="h-[640px] w-full bg-white"
-                          srcDoc={htmlForPreview(active.html, window.location.origin)}
+                          srcDoc={htmlForPreview(
+                            active.html,
+                            typeof window !== "undefined" ? window.location.origin : "",
+                          )}
                         />
                       </ScrollArea>
                     </div>
