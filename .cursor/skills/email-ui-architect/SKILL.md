@@ -7,7 +7,7 @@ description: Governs the HTML/CSS template structure, specifically injecting cro
 - When building or updating the HTML email template compiler (e.g., in `/lib/ai.ts` or `/lib/template.ts`).
 
 ## Main Instructions
-1. Pattern Design: Use a seamless, ultra-light geometric pattern (e.g., a minimal dot grid or faint diagonal hatch). 
+1. Pattern Design: Follow `.cursor/skills/email-html-engine/SKILL.md`. Use a Base64 SVG 45-degree intersecting line hatch on the email wrapper only — never on the Control Center UI. 
 2. Color Palette: The background base should be a soft off-white (e.g., `#fafafa` or `#fdfdfd`), and the pattern itself should be a very faint light gray (e.g., `#e5e7eb` or `#f3f4f6`) so it is barely perceptible but adds texture.
 3. Implementation (Data URI): Do NOT link to externally hosted background images. Instead, use a URL-encoded SVG or Base64 SVG inline directly in the CSS (e.g., `background-image: url("data:image/svg+xml,...");`).
 4. Structural Compatibility: 

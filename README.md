@@ -30,7 +30,7 @@ Outbound HTML includes a CID-linked signature image (`cid:jrsignature` → `publ
 
 ## Email template
 
-Outbound HTML sits on a 100% `#fafafa` wrapper with an inline SVG dot-grid (data URI, no remote images). The 600px card stays solid white (`#ffffff`) so copy stays readable. Outlook gets `bgcolor="#fafafa"` plus MSO ghost tables.
+Outbound HTML sits on a 100% `#fafafa` wrapper with a Base64 SVG 45° line hatch (`#e5e7eb` / `#d1d5db`). The 600px card stays solid white (`#ffffff`). Outlook gets `bgcolor="#fafafa"` plus MSO ghost tables. The Control Center UI stays solid — no patterns.
 
 Open `http://127.0.0.1:43149/email-preview.html` for a static sample.
 

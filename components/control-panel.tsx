@@ -230,7 +230,7 @@ export function ControlPanel() {
 
         <section
           className={cn(
-            "flex min-h-0 min-w-0 flex-1 flex-col bg-[#fafafa]",
+            "flex min-h-0 min-w-0 flex-1 flex-col bg-zinc-50",
             active ? "flex" : "hidden md:flex",
           )}
         >

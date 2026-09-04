@@ -42,11 +42,11 @@ export function EmailPreview({ html, title = "Email preview" }: EmailPreviewProp
   }, [srcDoc, measure]);
 
   if (!origin) {
-    return <div className="min-h-[560px] bg-[#fafafa]" aria-hidden />;
+    return <div className="min-h-[560px] bg-zinc-50" aria-hidden />;
   }
 
   return (
-    <div className="min-h-full bg-[#fafafa]">
+    <div className="min-h-full bg-zinc-50">
       <iframe
         ref={iframeRef}
         title={title}
@@ -55,7 +55,7 @@ export function EmailPreview({ html, title = "Email preview" }: EmailPreviewProp
         srcDoc={srcDoc}
         onLoad={measure}
         style={{ height }}
-        className="block w-full border-0 bg-[#fafafa]"
+        className="block w-full border-0 bg-zinc-50"
       />
     </div>
   );

@@ -5,6 +5,7 @@ import {
   CARD_BACKGROUND,
   CARD_BORDER,
   PATTERN_BASE_COLOR,
+  PATTERN_TILE_PX,
   geometricPatternDataUri,
   shellBackgroundStyle,
 } from "./pattern";
@@ -121,7 +122,7 @@ export function buildEmailMarkup(input: {
       background-color: ${PATTERN_BASE_COLOR};
       background-image: url('${pattern}');
       background-repeat: repeat;
-      background-size: 20px 20px;
+      background-size: ${PATTERN_TILE_PX}px ${PATTERN_TILE_PX}px;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       color: ${BODY_TEXT_COLOR};
     }
@@ -139,7 +140,7 @@ export function buildEmailMarkup(input: {
       background-color: ${PATTERN_BASE_COLOR};
       background-image: url('${pattern}');
       background-repeat: repeat;
-      background-size: 20px 20px;
+      background-size: ${PATTERN_TILE_PX}px ${PATTERN_TILE_PX}px;
     }
     .card {
       width: 100%;
