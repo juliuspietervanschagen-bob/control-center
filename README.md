@@ -26,7 +26,7 @@ Without real SMTP credentials, keep `SMTP_MOCK=true`. Set it to `false` and fill
 
 ## Email signature
 
-Outbound HTML includes a CID-linked signature image (`cid:jrsignature` → `public/assets/image_029d84.jpg`). Nodemailer attaches the JPEG inline — not as Base64 in the HTML — so clients render it without spam-prone data URIs. Replace that file in place to update the signature art.
+Outbound HTML includes CID-linked images: the header logo (`cid:jrlogo` → `public/assets/jr-logo.png`) and the footer signature (`cid:jrsignature` → `public/assets/image_029d84.jpg`). Nodemailer attaches both inline — not as Base64 in the HTML.
 
 ## Email template
 

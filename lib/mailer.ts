@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { config, contactEmailFor, fromAddressFor } from "../src/config/env";
 import { signatureAttachment } from "./signature";
+import { logoAttachment } from "./logo";
 
 export class SmtpError extends Error {
   constructor(message: string) {
@@ -43,7 +44,7 @@ export async function sendApprovedEmail(input: {
       subject: input.subject,
       text: input.text,
       html: input.html,
-      attachments: [signatureAttachment()],
+      attachments: [logoAttachment(), signatureAttachment()],
       headers: {
         "X-JR-Campaign": "b2b-outreach",
         "List-Unsubscribe": `<mailto:${contactEmailFor(language)}?subject=unsubscribe>`,

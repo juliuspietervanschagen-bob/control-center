@@ -1,4 +1,5 @@
 import path from "node:path";
+import { LOGO_CID, LOGO_FILENAME } from "./logo";
 
 export const SIGNATURE_CID = "jrsignature";
 export const SIGNATURE_FILENAME = "image_029d84.jpg";
@@ -36,10 +37,11 @@ export function signatureAttachment(): {
 
 export function htmlForPreview(html: string, origin = ""): string {
   const base = origin.replace(/\/+$/, "");
-  const src = base
-    ? `${base}/assets/${SIGNATURE_FILENAME}`
-    : `/assets/${SIGNATURE_FILENAME}`;
-  let preview = html.replaceAll(`cid:${SIGNATURE_CID}`, src);
+  const asset = (filename: string) =>
+    base ? `${base}/assets/${filename}` : `/assets/${filename}`;
+  let preview = html
+    .replaceAll(`cid:${SIGNATURE_CID}`, asset(SIGNATURE_FILENAME))
+    .replaceAll(`cid:${LOGO_CID}`, asset(LOGO_FILENAME));
   // srcDoc iframes resolve relative URLs unreliably; pin an absolute base when we have one.
   if (base && !/<base\s/i.test(preview)) {
     preview = preview.replace(

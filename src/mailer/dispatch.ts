@@ -6,6 +6,7 @@ import { hasBeenEmailed, recordSend } from "../db/campaignState";
 import { formatDuration, randomJitterMs, wait } from "./jitter";
 import { createTransport } from "./transport";
 import { signatureAttachment } from "../../lib/signature";
+import { logoAttachment } from "../../lib/logo";
 
 function slug(value: string): string {
   return value
@@ -51,7 +52,7 @@ export async function dispatchEmail(
     subject: email.subject,
     text: email.bodyText,
     html: email.html,
-    attachments: [signatureAttachment()],
+    attachments: [logoAttachment(), signatureAttachment()],
     headers: {
       "X-JR-Campaign": "b2b-outreach",
       "List-Unsubscribe": `<mailto:${contactEmailFor(email.lead.languagePreference)}?subject=unsubscribe>`,

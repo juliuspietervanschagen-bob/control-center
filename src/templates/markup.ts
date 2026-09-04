@@ -10,6 +10,7 @@ import {
   shellBackgroundStyle,
 } from "./pattern";
 import { signatureBlock } from "../../lib/signature";
+import { logoImgTag } from "../../lib/logo";
 
 function escapeHtml(value: string): string {
   return value
@@ -208,8 +209,8 @@ export function buildEmailMarkup(input: {
         <![endif]-->
         <table class="card" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="${CARD_BACKGROUND}" style="width:100%;max-width:600px;margin:0 auto;background-color:${CARD_BACKGROUND};border:1px solid ${CARD_BORDER};border-radius:8px;">
           <tr>
-            <td style="padding:40px 40px 16px 40px;background-color:${CARD_BACKGROUND};border-radius:8px 8px 0 0;">
-              <p class="brand">JR Intelligence</p>
+            <td align="center" style="padding:32px 40px 16px 40px;background-color:${CARD_BACKGROUND};border-radius:8px 8px 0 0;">
+              ${logoImgTag()}
             </td>
           </tr>
           <tr>
