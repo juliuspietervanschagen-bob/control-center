@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { CliOptions, GeneratedEmail, Lead } from "../config/types";
-import { config, ensureDir } from "../config/env";
+import { config, contactEmailFor, ensureDir, fromAddressFor } from "../config/env";
 import { hasBeenEmailed, recordSend } from "../db/campaignState";
 import { formatDuration, randomJitterMs, wait } from "./jitter";
 import { createTransport } from "./transport";
@@ -46,7 +46,7 @@ export async function dispatchEmail(
 
   const transport = createTransport();
   const info = await transport.sendMail({
-    from: config.smtpFrom,
+    from: fromAddressFor(email.lead.languagePreference),
     to: email.lead.contactEmail,
     subject: email.subject,
     text: email.bodyText,
@@ -54,7 +54,7 @@ export async function dispatchEmail(
     attachments: [signatureAttachment()],
     headers: {
       "X-JR-Campaign": "b2b-outreach",
-      "List-Unsubscribe": `<mailto:${config.optOutEmail}?subject=unsubscribe>`,
+      "List-Unsubscribe": `<mailto:${contactEmailFor(email.lead.languagePreference)}?subject=unsubscribe>`,
       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     },
   });

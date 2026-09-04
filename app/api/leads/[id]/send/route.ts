@@ -43,6 +43,7 @@ export async function POST(
       subject,
       text: bodyText,
       html: compiled.html,
+      language: lead.language,
     });
 
     try {

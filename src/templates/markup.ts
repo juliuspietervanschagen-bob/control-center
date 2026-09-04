@@ -1,5 +1,5 @@
 import type { LanguagePreference, Lead } from "../config/types";
-import { config } from "../config/env";
+import { config, contactEmailFor } from "../config/env";
 import {
   BODY_TEXT_COLOR,
   CARD_BACKGROUND,
@@ -70,16 +70,19 @@ function stripTrailingSignoff(bodyText: string): string {
     .trim();
 }
 
-function optOutCopy(language: LanguagePreference): { label: string; line: string } {
+function optOutCopy(language: LanguagePreference): { label: string; line: string; email: string } {
+  const email = contactEmailFor(language);
   if (language === "nl") {
     return {
       label: "Afmelden",
-      line: `Wil je geen e-mails meer van JR Intelligence? Antwoord met "unsubscribe" of stuur een bericht naar ${config.optOutEmail}.`,
+      email,
+      line: `Wil je geen e-mails meer van JR Intelligence? Antwoord met "unsubscribe" of stuur een bericht naar ${email}.`,
     };
   }
   return {
     label: "Opt out",
-    line: `If you would prefer not to receive emails from JR Intelligence, reply with "unsubscribe" or write to ${config.optOutEmail}.`,
+    email,
+    line: `If you would prefer not to receive emails from JR Intelligence, reply with "unsubscribe" or write to ${email}.`,
   };
 }
 
@@ -225,7 +228,7 @@ export function buildEmailMarkup(input: {
             <td class="optout" style="padding:16px 40px 40px 40px;background-color:${CARD_BACKGROUND};border-radius:0 0 8px 8px;">
               <p class="footer-copy">${escapeHtml(optOut.line)}</p>
               <p class="footer-copy">
-                <a href="mailto:${escapeHtml(config.optOutEmail)}?subject=${encodeURIComponent(optOut.label)}">${escapeHtml(optOut.label)}</a>
+                <a href="mailto:${escapeHtml(optOut.email)}?subject=${encodeURIComponent(optOut.label)}">${escapeHtml(optOut.label)}</a>
                 ·
                 <a href="${escapeHtml(config.agencyUrl)}">${escapeHtml(config.agencyUrl.replace(/^https?:\/\//, ""))}</a>
               </p>

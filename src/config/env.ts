@@ -30,7 +30,7 @@ export const config = {
   smtpSecure: envBool("SMTP_SECURE", false),
   smtpUser: envString("SMTP_USER", ""),
   smtpPass: envString("SMTP_PASS", ""),
-  smtpFrom: envString("SMTP_FROM", "JR Intelligence <hello@jrintelligence.com>"),
+  smtpFrom: envString("SMTP_FROM", "JR Intelligence <hello@jr-intelligence.com>"),
   leadsCsv: path.resolve(process.cwd(), envString("LEADS_CSV", "./leads.csv")),
   campaignStatePath: path.resolve(
     process.cwd(),
@@ -40,7 +40,8 @@ export const config = {
     process.cwd(),
     envString("TEST_EMAILS_DIR", "./dist/test-emails"),
   ),
-  optOutEmail: envString("OPTOUT_EMAIL", "optout@jrintelligence.com"),
+  contactEmailEn: envString("CONTACT_EMAIL_EN", "hello@jr-intelligence.com"),
+  contactEmailNl: envString("CONTACT_EMAIL_NL", "hallo@jr-intelligence.com"),
   agencyUrl: envString("AGENCY_URL", "https://jr-intelligence.com"),
   jitterMinMinutes: envNumber("JITTER_MIN_MINUTES", 3),
   jitterMaxMinutes: envNumber("JITTER_MAX_MINUTES", 9),
@@ -57,6 +58,17 @@ export const config = {
 
 export function hasOpenAiKey(): boolean {
   return config.openaiApiKey.length > 0;
+}
+
+export function contactEmailFor(language: "en" | "nl" | string): string {
+  return language === "nl" ? config.contactEmailNl : config.contactEmailEn;
+}
+
+export function fromAddressFor(language: "en" | "nl" | string): string {
+  if (language === "nl") {
+    return `JR Intelligence <${config.contactEmailNl}>`;
+  }
+  return config.smtpFrom;
 }
 
 export function assertSmtpConfigured(): void {

@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { config } from "../src/config/env";
+import { config, contactEmailFor, fromAddressFor } from "../src/config/env";
 import { signatureAttachment } from "./signature";
 
 export class SmtpError extends Error {
@@ -32,11 +32,13 @@ export async function sendApprovedEmail(input: {
   subject: string;
   text: string;
   html: string;
+  language?: string;
 }): Promise<{ messageId: string; mocked: boolean }> {
   try {
     const transport = createTransport();
+    const language = input.language === "nl" ? "nl" : "en";
     const info = await transport.sendMail({
-      from: config.smtpFrom,
+      from: fromAddressFor(language),
       to: input.to,
       subject: input.subject,
       text: input.text,
@@ -44,7 +46,7 @@ export async function sendApprovedEmail(input: {
       attachments: [signatureAttachment()],
       headers: {
         "X-JR-Campaign": "b2b-outreach",
-        "List-Unsubscribe": `<mailto:${config.optOutEmail}?subject=unsubscribe>`,
+        "List-Unsubscribe": `<mailto:${contactEmailFor(language)}?subject=unsubscribe>`,
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
       },
     });
