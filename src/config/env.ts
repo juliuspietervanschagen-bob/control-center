@@ -41,7 +41,7 @@ export const config = {
     envString("TEST_EMAILS_DIR", "./dist/test-emails"),
   ),
   optOutEmail: envString("OPTOUT_EMAIL", "optout@jrintelligence.com"),
-  agencyUrl: envString("AGENCY_URL", "https://jrintelligence.com"),
+  agencyUrl: envString("AGENCY_URL", "https://jr-intelligence.com"),
   jitterMinMinutes: envNumber("JITTER_MIN_MINUTES", 3),
   jitterMaxMinutes: envNumber("JITTER_MAX_MINUTES", 9),
   previewPort: envNumber("PREVIEW_PORT", 43147),
