@@ -8,6 +8,7 @@ Live control panel for JR Intelligence outreach. Sync leads from the external da
 npm install
 cp .env.example .env
 npx prisma db push
+npm run db:seed
 npm run dev
 ```
 

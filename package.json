@@ -10,6 +10,7 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
+    "db:seed": "npx tsx prisma/seed.ts",
     "dry-run": "ts-node --project tsconfig.cli.json src/main.ts --dry-run --preview",
     "send:csv": "ts-node --project tsconfig.cli.json src/main.ts",
     "preview": "ts-node --project tsconfig.cli.json src/preview/server.ts",
@@ -17,8 +18,8 @@
     "test:dashboard": "ts-node --project tsconfig.cli.json src/main.ts --test-dashboard",
     "mock:dashboard": "ts-node --project tsconfig.cli.json src/mock/dashboardServer.ts"
   },
-  "engines": {
-    "node": ">=20"
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
   },
   "license": "UNLICENSED",
   "dependencies": {
