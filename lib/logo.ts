@@ -8,7 +8,7 @@ export function logoFilePath(): string {
 }
 
 export function logoImgTag(): string {
-  return `<img src="cid:${LOGO_CID}" alt="JR Intelligence" width="168" style="display:block;margin:0 auto;max-width:168px;height:auto;border:0;outline:none;">`;
+  return `<img src="cid:${LOGO_CID}" alt="JR Intelligence" width="180" height="180" style="display:block;margin:0 auto;max-width:180px;height:auto;border:0;outline:none;">`;
 }
 
 export function logoAttachment(): {
