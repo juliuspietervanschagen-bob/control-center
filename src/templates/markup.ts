@@ -20,7 +20,15 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function bodyToHtml(bodyText: string): string {
+function isAuditHeading(line: string): boolean {
+  return /^(verbeterpunten|points for improvement)\s*:?$/i.test(line.trim());
+}
+
+function auditHeading(language: LanguagePreference): string {
+  return language === "nl" ? "Verbeterpunten" : "Points for improvement";
+}
+
+function bodyToHtml(bodyText: string, language: LanguagePreference): string {
   const lines = bodyText.replace(/\r\n/g, "\n").split("\n");
   const html: string[] = [];
   let paragraph: string[] = [];
@@ -38,11 +46,17 @@ function bodyToHtml(bodyText: string): string {
     const items = bullets
       .map((item) => `<li>${escapeHtml(item)}</li>`)
       .join("");
-    html.push(`<ul class="audit-list">${items}</ul>`);
+    html.push(
+      `<p class="audit-heading">${escapeHtml(auditHeading(language))}</p>`,
+      `<ul class="audit-list">${items}</ul>`,
+    );
     bullets = [];
   };
 
   for (const raw of lines) {
+    if (isAuditHeading(raw)) {
+      continue;
+    }
     const match = raw.match(/^\s*[-*•]\s+(.+)$/);
     if (match?.[1]) {
       flushParagraph();
@@ -95,7 +109,7 @@ export function buildEmailMarkup(input: {
   const pattern = geometricPatternDataUri();
   const shellStyle = shellBackgroundStyle();
   const optOut = optOutCopy(input.lead.languagePreference);
-  const bodyHtml = bodyToHtml(stripTrailingSignoff(input.bodyText));
+  const bodyHtml = bodyToHtml(stripTrailingSignoff(input.bodyText), input.lead.languagePreference);
   const previewText =
     input.lead.languagePreference === "nl"
       ? `Kort bericht van JR Intelligence voor ${input.lead.companyName}.`
@@ -170,6 +184,13 @@ export function buildEmailMarkup(input: {
       font-size: 16px;
       line-height: 1.6;
       color: ${BODY_TEXT_COLOR};
+    }
+    .audit-heading {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      line-height: 1.6;
+      color: ${BODY_TEXT_COLOR};
+      font-weight: 600;
     }
     .audit-list {
       margin: 0 0 16px 0;
