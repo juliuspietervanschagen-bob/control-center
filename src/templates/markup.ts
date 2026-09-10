@@ -230,7 +230,7 @@ export function buildEmailMarkup(input: {
         <![endif]-->
         <table class="card" role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="${CARD_BACKGROUND}" style="width:100%;max-width:600px;margin:0 auto;background-color:${CARD_BACKGROUND};border:1px solid ${CARD_BORDER};border-radius:8px;">
           <tr>
-            <td align="center" style="padding:32px 40px 16px 40px;background-color:${CARD_BACKGROUND};border-radius:8px 8px 0 0;">
+            <td align="center" style="padding:28px 40px 14px 40px;background-color:${CARD_BACKGROUND};border-radius:8px 8px 0 0;">
               ${logoImgTag()}
             </td>
           </tr>
